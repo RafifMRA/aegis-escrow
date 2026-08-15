@@ -2,10 +2,9 @@
 
 An arbitrated escrow smart contract on the Stellar network (Soroban). Funds are locked between a **payer** and a **payee**, released either by the payer or a neutral **arbiter**, or refunded to the payer by the arbiter if the deal falls through. Includes a full test suite, CI, and a zero-build static web UI for interacting with a deployed instance.
 
-- **Live demo:** _TODO — paste your Vercel/Netlify URL here_
-- **Contract address (Testnet):** _TODO — paste the `C...` contract ID here after deployment_
-- **Example transaction hash:** _TODO — paste a real testnet transaction hash here (e.g. a `release` call)_
-- **Demo video (1–2 min):** _TODO — paste the video link here_
+- **Live demo:** https://aegis-escrow-nine.vercel.app/
+- **Contract address (Testnet):** CA3TIYR7MAWCOMX66QHTDN25RNZFNBPV53JIXRE4T6D6BCD3KOL3VQ4J
+- **Example transaction hash:** https://stellar.expert/explorer/testnet/tx/6c68f1ba4f288086d10b0689ee1cd5aa048f38d70ab585cb448140e4f8e0a788
 
 ---
 
