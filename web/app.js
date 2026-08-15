@@ -5,7 +5,12 @@
 // a CDN as an ES module) for building, simulating, and submitting Soroban
 // contract-invocation transactions against the escrow-vault contract.
 
-import * as StellarSdk from "https://esm.sh/@stellar/stellar-sdk@12?bundle";
+// esm.sh only exposes this package's exports correctly through `?bundle`
+// (its plain ESM build fails to resolve internal subpaths), and `?bundle`
+// in turn puts everything under a single `default` export rather than as
+// named exports — hence the extra unwrap below.
+const StellarSdkModule = await import("https://esm.sh/@stellar/stellar-sdk@12?bundle");
+const StellarSdk = StellarSdkModule.default;
 
 const NETWORKS = {
   testnet: {
