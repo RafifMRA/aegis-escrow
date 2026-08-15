@@ -197,7 +197,10 @@ Both platforms auto-deploy on every push to `main` once connected.
 
 | Mobile responsive UI | CI/CD pipeline | Test output |
 |---|---|---|
-| _TODO: screenshot_ | _TODO: screenshot_ | _TODO: screenshot_ |
+| <img width="755" height="479" alt="image" src="https://github.com/user-attachments/assets/e9dacadb-f1f4-41c0-ba14-065a26190ef1" />
+ | <img width="662" height="170" alt="image" src="https://github.com/user-attachments/assets/e7652dfe-eb69-4857-9d80-aa1b450fce70" />
+ | <img width="792" height="331" alt="image" src="https://github.com/user-attachments/assets/d84e357f-39d9-47e9-b29b-c7788a826859" />
+ |
 
 ## Security notes
 
