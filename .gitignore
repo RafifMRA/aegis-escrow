@@ -1,0 +1,15 @@
+/target
+/test_snapshots
+**/*.rs.bk
+*.pdb
+
+# Editor/OS cruft
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local env files (never commit secrets/keys)
+.env
+.env.local
+*.key
