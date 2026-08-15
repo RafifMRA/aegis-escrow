@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Escrow Vault | Stellar Soroban</title>
+    <meta
+      name="description"
+      content="Arbitrated escrow vault on Stellar Soroban — lock funds between a payer and payee until an arbiter approves release or refund."
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="top">
+        <div class="brand">
+          <div class="logo" aria-hidden="true"></div>
+          <div>
+            <h1>Escrow Vault</h1>
+            <p>Arbitrated escrow on Stellar Soroban</p>
+          </div>
+        </div>
+        <div id="wallet-bar">
+          <span id="wallet-address">Wallet not connected</span>
+          <button id="connect-btn" class="btn-primary">Connect Freighter</button>
+        </div>
+      </header>
+
+      <main>
+        <div class="grid-2">
+          <div>
+            <section class="card">
+              <h2>⚙️ Contract Settings</h2>
+              <div class="field">
+                <label for="network-select">Network</label>
+                <select id="network-select">
+                  <option value="testnet" selected>Testnet</option>
+                  <option value="futurenet">Futurenet</option>
+                  <option value="mainnet">Mainnet (public)</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="contract-id">Contract ID</label>
+                <input id="contract-id" type="text" placeholder="C..." autocomplete="off" spellcheck="false" />
+                <p class="hint">Paste the deployed escrow-vault contract address here. Saved locally in your browser.</p>
+              </div>
+              <button id="save-settings-btn" class="btn-secondary btn-block">Save Settings</button>
+            </section>
+
+            <section class="card">
+              <h2>🚀 Initialize Escrow</h2>
+              <p class="hint">Called by the connected wallet, which becomes the <strong>payer</strong>.</p>
+              <div class="field">
+                <label for="init-payee">Payee address (G...)</label>
+                <input id="init-payee" type="text" placeholder="G..." autocomplete="off" spellcheck="false" />
+              </div>
+              <div class="field">
+                <label for="init-arbiter">Arbiter address (G...)</label>
+                <input id="init-arbiter" type="text" placeholder="G..." autocomplete="off" spellcheck="false" />
+              </div>
+              <div class="field">
+                <label for="init-token">Token contract address (C...)</label>
+                <input id="init-token" type="text" placeholder="C..." autocomplete="off" spellcheck="false" />
+              </div>
+              <div class="field">
+                <label for="init-amount">Amount (in token base units)</label>
+                <input id="init-amount" type="number" min="1" step="1" placeholder="e.g. 10000000" />
+              </div>
+              <button id="init-btn" class="btn-primary btn-block">Initialize</button>
+            </section>
+          </div>
+
+          <div>
+            <section class="card">
+              <h2>📦 Escrow Status</h2>
+              <div id="status-badge-wrap">
+                <span class="status-badge unknown" id="status-badge">Not loaded</span>
+              </div>
+              <dl class="details" id="escrow-details" hidden>
+                <dt>Payer</dt>
+                <dd id="d-payer">–</dd>
+                <dt>Payee</dt>
+                <dd id="d-payee">–</dd>
+                <dt>Arbiter</dt>
+                <dd id="d-arbiter">–</dd>
+                <dt>Token</dt>
+                <dd id="d-token">–</dd>
+                <dt>Amount</dt>
+                <dd id="d-amount">–</dd>
+                <dt>Funded</dt>
+                <dd id="d-funded">–</dd>
+              </dl>
+              <button id="refresh-btn" class="btn-secondary btn-block" style="margin-top: 12px">
+                Refresh Status
+              </button>
+            </section>
+
+            <section class="card">
+              <h2>🔐 Actions</h2>
+              <div class="row">
+                <button id="deposit-btn" class="btn-primary">Deposit</button>
+                <button id="release-btn" class="btn-primary">Release</button>
+                <button id="refund-btn" class="btn-danger">Refund</button>
+              </div>
+              <p class="hint" style="margin-top: 10px">
+                Deposit: payer only. Release: payer or arbiter. Refund: arbiter only.
+              </p>
+            </section>
+          </div>
+        </div>
+
+        <section class="card">
+          <h2>📜 Activity Log</h2>
+          <div id="activity-log">
+            <div class="empty">No activity yet. Connect your wallet and initialize an escrow to get started.</div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
