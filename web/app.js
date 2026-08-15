@@ -1,16 +1,22 @@
 // Escrow Vault dApp frontend.
 //
-// Zero-build static app: talks to Freighter (injected `window.freighterApi`)
-// for wallet connection/signing, and to `@stellar/stellar-sdk` (loaded from
-// a CDN as an ES module) for building, simulating, and submitting Soroban
-// contract-invocation transactions against the escrow-vault contract.
+// Zero-build static app: talks to the Freighter wallet extension via the
+// official `@stellar/freighter-api` package for connection/signing, and to
+// `@stellar/stellar-sdk` for building, simulating, and submitting Soroban
+// contract-invocation transactions against the escrow-vault contract. Both
+// are loaded from a CDN as ES modules — no bundler, no node_modules.
 
-// esm.sh only exposes this package's exports correctly through `?bundle`
-// (its plain ESM build fails to resolve internal subpaths), and `?bundle`
-// in turn puts everything under a single `default` export rather than as
-// named exports — hence the extra unwrap below.
+// esm.sh only exposes these packages' exports correctly through a CJS-style
+// `default` bundle rather than as named exports when loaded raw over a CDN
+// (their plain ESM builds either fail to resolve internal subpaths, or lose
+// their named exports) — hence the extra unwrap on both imports below.
+// Verified directly against each package's published source before relying
+// on this shape (see commit history / README for details).
 const StellarSdkModule = await import("https://esm.sh/@stellar/stellar-sdk@12?bundle");
 const StellarSdk = StellarSdkModule.default;
+
+const FreighterApiModule = await import("https://esm.sh/@stellar/freighter-api");
+const Freighter = FreighterApiModule.default;
 
 const NETWORKS = {
   testnet: {
@@ -124,25 +130,21 @@ function renderWallet() {
 }
 
 async function connectWallet() {
-  if (!window.freighterApi) {
-    logEntry({
-      title: "Freighter extension not found",
-      detail: "Install the Freighter wallet browser extension from freighter.app and reload this page.",
-      isError: true,
-    });
-    return;
-  }
   try {
-    const connected = await window.freighterApi.isConnected();
-    if (!connected?.isConnected) {
-      await window.freighterApi.setAllowed();
+    const connected = await Freighter.isConnected();
+    if (connected.error) throw new Error(connected.error);
+    if (!connected.isConnected) {
+      throw new Error(
+        "Freighter extension not detected. Install it from freighter.app and reload this page."
+      );
     }
-    const access = await window.freighterApi.requestAccess();
-    if (access?.error) throw new Error(access.error);
 
-    const addressResult = await window.freighterApi.getAddress();
-    state.address = addressResult.address || addressResult;
+    // requestAccess() both prompts for permission (if not already granted)
+    // and returns the selected address in the same call.
+    const access = await Freighter.requestAccess();
+    if (access.error) throw new Error(access.error);
 
+    state.address = access.address;
     renderWallet();
     logEntry({ title: "Wallet connected", detail: state.address });
   } catch (err) {
@@ -248,14 +250,16 @@ async function invokeContract(method, args = []) {
 
   const prepared = await server.prepareTransaction(tx);
 
-  const signResult = await window.freighterApi.signTransaction(prepared.toXDR(), {
+  const signResult = await Freighter.signTransaction(prepared.toXDR(), {
     networkPassphrase: NETWORKS[state.network].passphrase,
     address: walletAddress,
   });
-  const signedXdr = typeof signResult === "string" ? signResult : signResult.signedTxXdr;
-  if (!signedXdr) throw new Error("Wallet did not return a signed transaction.");
+  if (signResult.error) throw new Error(signResult.error);
 
-  const signedTx = StellarSdk.TransactionBuilder.fromXDR(signedXdr, NETWORKS[state.network].passphrase);
+  const signedTx = StellarSdk.TransactionBuilder.fromXDR(
+    signResult.signedTxXdr,
+    NETWORKS[state.network].passphrase
+  );
   const sendResponse = await server.sendTransaction(signedTx);
 
   if (sendResponse.status === "ERROR") {
