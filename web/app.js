@@ -118,6 +118,14 @@ function logEntry({ title, detail, hash, isError }) {
 // Wallet connection (Freighter)
 // ---------------------------------------------------------------------
 
+// Freighter's error results are `{ code, message, ext? }` objects, not
+// plain strings — passing one straight to `new Error(...)` stringifies to
+// "[object Object]". Unwrap `.message`, with a fallback in case a future
+// API version changes the shape.
+function freighterErrorMessage(error) {
+  return (error && error.message) || String(error);
+}
+
 function truncate(address) {
   return address ? `${address.slice(0, 4)}…${address.slice(-4)}` : "";
 }
@@ -132,7 +140,7 @@ function renderWallet() {
 async function connectWallet() {
   try {
     const connected = await Freighter.isConnected();
-    if (connected.error) throw new Error(connected.error);
+    if (connected.error) throw new Error(freighterErrorMessage(connected.error));
     if (!connected.isConnected) {
       throw new Error(
         "Freighter extension not detected. Install it from freighter.app and reload this page."
@@ -142,7 +150,7 @@ async function connectWallet() {
     // requestAccess() both prompts for permission (if not already granted)
     // and returns the selected address in the same call.
     const access = await Freighter.requestAccess();
-    if (access.error) throw new Error(access.error);
+    if (access.error) throw new Error(freighterErrorMessage(access.error));
 
     state.address = access.address;
     renderWallet();
@@ -254,7 +262,7 @@ async function invokeContract(method, args = []) {
     networkPassphrase: NETWORKS[state.network].passphrase,
     address: walletAddress,
   });
-  if (signResult.error) throw new Error(signResult.error);
+  if (signResult.error) throw new Error(freighterErrorMessage(signResult.error));
 
   const signedTx = StellarSdk.TransactionBuilder.fromXDR(
     signResult.signedTxXdr,
